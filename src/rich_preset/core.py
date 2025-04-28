@@ -28,12 +28,6 @@ from rich.layout import Layout
 from rich.live import Live
 # rich库不包含checkbox模块
 
-# 可选的dotenv导入
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
 
 # 使用共同的类定义，保持兼容性
 class ConfigOption:

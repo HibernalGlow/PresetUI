@@ -6,18 +6,30 @@ build-backend = "setuptools.build_meta"
 name = "PresetUI"
 version = "0.1.0"
 description = "预设命令行界面工具"
+license = {text = "MIT"}
 authors = [
     {name = "Your Name", email = "your.email@example.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.6"
-license = "MIT"
 classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: User Interfaces",
 ]
 dependencies = [
-    "click>=8.0.0",
-    "colorama>=0.4.4", 
     "pyyaml>=6.0",
+    "rich>=10.0.0",
+    "textual>=0.10.1",
+    "pyperclip>=1.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "black>=22.0",
+    "isort>=5.0",
 ]
 
 [project.urls]
@@ -25,7 +37,15 @@ Homepage = "https://github.com/HibernalGlow/PresetUI"
 Issues = "https://github.com/HibernalGlow/PresetUI/issues"
 
 [project.scripts]
-presetui = "main:main"  # 假设main.py中有main函数
+presetui = "presetui.cli:main"  # 添加全局命令入口点
+
 [tool.setuptools]
-package-dir = {"" = "src"}
-packages = ["rich_preset", "textual_preset"]
+package-dir = {"" = "src"}  # 告诉 setuptools 包位于 src 目录
+packages = ["rich_preset", "textual_preset", "presetui"]  # 添加主包 presetui
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]
+
+[tool.isort]
+profile = "black"

@@ -26,10 +26,6 @@ import json
 import multiprocessing
 from multiprocessing import Process, Pipe
 from typing import Tuple, Dict, List, Any, Callable, Union
-from dotenv import load_dotenv
-
-# 加载环境变量
-load_dotenv()
 
 class ConfigOption:
     """配置选项基类"""
@@ -517,8 +513,8 @@ class ConfigTemplate(App[None]):
         terminal_title = f'{script_name} {current_time}' # 旧的标题生成方式
 
         # 获取Python路径
-        python_path = os.getenv('PYTHON_PATH')
-        
+        # python_path = os.getenv('PYTHON_PATH')
+        python_path = "python"  # 使用当前Python解释器的路径
 
         # 尝试使用Windows Terminal
         try:
@@ -585,7 +581,7 @@ def create_config_app(
     # 如果使用Rich模式，直接调用rich_preset模块
     if rich_mode:
         try:
-            from .rich_preset import create_config_app as rich_create_config_app
+            from rich_preset import create_config_app as rich_create_config_app
             result = rich_create_config_app(
                 program=program,
                 # Pass original lists or adapt rich_create_config_app
@@ -719,7 +715,7 @@ if __name__ == "__main__":
         # title="TUI配置界面演示 (无下拉选择)", # Updated title
         parser=parser, # Let it generate options from parser
         preset_configs=PRESET_CONFIGS,
-        # rich_mode=True # Set to True to test rich mode (requires rich_preset.py update)
+        rich_mode=True # Set to True to test rich mode (requires rich_preset.py update)
     )
     if app:
         app.run()
