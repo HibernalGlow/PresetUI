@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PresetUI"
+version = "0.1.0"
+description = "预设命令行界面工具"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.6"
+license = "MIT"
+classifiers = [
+]
+dependencies = [
+    "click>=8.0.0",
+    "colorama>=0.4.4", 
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/HibernalGlow/PresetUI"
+Issues = "https://github.com/HibernalGlow/PresetUI/issues"
+
+[project.scripts]
+presetui = "main:main"  # 假设main.py中有main函数
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["rich_preset", "textual_preset"]
