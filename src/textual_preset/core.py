@@ -65,21 +65,10 @@ class ConfigTemplate(App[None]):
     """通用配置界面模板"""
     
     # 类级变量作为CSS缓存
-    _css_cache = None
+    # _css_cache = None
     
     # 使用属性装饰器实现CSS懒加载和缓存
-    @property
-    def CSS(self) -> str:
-        if ConfigTemplate._css_cache is None:
-            try:
-                css_path = os.path.join(os.path.dirname(__file__), "textual_preset.css")
-                with open(css_path, "r", encoding="utf-8") as f:
-                    ConfigTemplate._css_cache = f.read()
-            except Exception as e:
-                import logging
-                logging.error(f"无法读取CSS文件: {e}")
-                # 提供基础CSS作为回退选项
-        return ConfigTemplate._css_cache
+    CSS_PATH = os.path.join(os.path.dirname(__file__), "textual_preset.css")
         
     BINDINGS = [
         Binding("q", "quit", "退出"),

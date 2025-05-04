@@ -41,7 +41,10 @@ presetui = "presetui.cli:main"  # 添加全局命令入口点
 
 [tool.setuptools]
 package-dir = {"" = "src"}  # 告诉 setuptools 包位于 src 目录
-packages = ["rich_preset", "textual_preset", "presetui"]  # 添加主包 presetui
+packages = ["rich_preset", "textual_preset", "presetui"]
+  # 添加主包 presetui
+[tool.setuptools.package-data]
+textual_preset = ["*.css"]
 
 [tool.black]
 line-length = 88
