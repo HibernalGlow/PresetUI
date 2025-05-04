@@ -16,8 +16,29 @@ def main():
     if len(sys.argv) > 1 and sys.argv[1] == "--textual":
         return textual_create_config_app()
     else:
-        # 默认使用 rich 界面
-        return rich_create_config_app()
+            PRESET_CONFIGS = {
+            "默认配置": {
+                "description": "基础配置示例",
+                "checkbox_options": ["feature1"], # Use opt_id (dest)
+                "input_values": {
+                    "number": "100", # Use opt_id (dest)
+                    "text": "",
+                    # "path": "", # Assuming no path arg
+                    "choice": "A" # Use opt_id (dest)
+                }
+            },
+        }
+
+        # 直接运行配置界面并获取结果
+            result = rich_create_config_app(
+                program="presetui.py",
+                title="presetui主界面",
+                preset_configs=PRESET_CONFIGS,
+                rich_mode=True # Force rich mode for testing
+            )
+
+            # 默认使用 rich 界面
+            return result
 
 if __name__ == "__main__":
     main()
