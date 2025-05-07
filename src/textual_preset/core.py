@@ -27,6 +27,15 @@ import multiprocessing
 from multiprocessing import Process, Pipe
 from typing import Tuple, Dict, List, Any, Callable, Union
 
+# 导入虚拟环境检测功能
+try:
+    from presetui import get_python_command
+except ImportError:
+    # 如果未安装作为包，提供内联实现
+    def get_python_command() -> Tuple[str, bool]:
+        """提供一个默认的Python命令获取方法"""
+        return "python", False
+
 class ConfigOption:
     """配置选项基类"""
     def __init__(self, label: str, id: str, arg: str):
@@ -509,7 +518,7 @@ class ConfigTemplate(App[None]):
 
         # 获取Python路径
         # python_path = os.getenv('PYTHON_PATH')
-        python_path = "python"  # 使用当前Python解释器的路径
+        python_path, is_venv = get_python_command()  # 使用虚拟环境检测功能
 
         # 尝试使用Windows Terminal
         try:

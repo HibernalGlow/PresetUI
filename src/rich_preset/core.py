@@ -112,8 +112,17 @@ class RichConfigApp:
     
     def _generate_command_preview(self) -> str:
         """生成命令预览字符串"""
-        # 使用简化的python命令前缀
-        cmd = ["python"]
+        # 使用虚拟环境检测功能
+        try:
+            from presetui import get_python_command
+            python_cmd, is_venv = get_python_command()
+        except ImportError:
+            # 如果未安装为包，使用普通python命令
+            python_cmd = "python"
+            is_venv = False
+            
+        # 使用检测到的Python命令
+        cmd = [python_cmd]
         
         # 检查是否使用模块方式运行
         if self.module_name:
