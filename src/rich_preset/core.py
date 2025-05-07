@@ -90,7 +90,8 @@ class RichConfigApp:
         parameter_options: List[Union[InputOption, SelectOption]] = None, # <-- Use combined list
         extra_args: List[str] = None,
         demo_mode: bool = False,
-        presets: List[PresetConfig] = None
+        presets: List[PresetConfig] = None,
+        module_name: str = None
     ):
         self.console = Console()
         self.program = program
@@ -107,15 +108,20 @@ class RichConfigApp:
              self._parameter_values[opt.id] = opt.default
         self._selected_preset = None
         self._preset_selected = False
+        self.module_name = module_name
     
     def _generate_command_preview(self) -> str:
         """生成命令预览字符串"""
         # 使用简化的python命令前缀
         cmd = ["python"]
         
-        # 添加程序路径（去掉多余的引号）
-        program_path = self.program.strip('"')
-        cmd.append(program_path)
+        # 检查是否使用模块方式运行
+        if self.module_name:
+            cmd.extend(["-m", self.module_name])
+        else:
+            # 添加程序路径（去掉多余的引号）
+            program_path = self.program.strip('"')
+            cmd.append(program_path)
 
         # 添加选中的功能选项
         for opt in self.checkbox_options:
@@ -477,7 +483,8 @@ def create_config_app(
     on_run: Callable[[dict], None] = None,  
     parser: argparse.ArgumentParser = None,
     run_in_subprocess: bool = False,
-    rich_mode: bool = False
+    rich_mode: bool = False,
+    module_name: str = None
 ) -> Any:
     """
     创建配置界面的便捷函数
@@ -495,6 +502,7 @@ def create_config_app(
         parser: ArgumentParser实例，用于自动生成选项
         run_in_subprocess: 是否在子进程中运行（在rich版本中忽略）
         rich_mode: 是否使用rich模式返回结果
+        module_name: 模块名称（如果使用模块方式运行）
     
     Returns:
         返回一个包含配置结果的对象:
@@ -582,7 +590,8 @@ def create_config_app(
         parameter_options=param_opts, # <-- Pass combined list
         extra_args=extra_args,
         demo_mode=demo_mode,
-        presets=preset_list
+        presets=preset_list,
+        module_name=module_name
     )
     
     # 运行应用并返回结果
@@ -684,7 +693,8 @@ if __name__ == "__main__":
         title="Rich配置界面演示 (含下拉选择)",
         parser=parser,
         preset_configs=PRESET_CONFIGS,
-        rich_mode=True # Force rich mode for testing
+        rich_mode=True, # Force rich mode for testing
+        module_name="demo_module"
     )
 
     # 处理结果 (rich_mode=True returns the dict)
@@ -708,6 +718,3 @@ if __name__ == "__main__":
             print(parsed_args)
         except Exception as e:
             print(f"无法解析参数: {e}")
-
-    else:
-        print("操作被取消")

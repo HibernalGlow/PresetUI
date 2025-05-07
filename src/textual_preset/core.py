@@ -85,7 +85,8 @@ class ConfigTemplate(App[None]):
         extra_args: List[str] = None,
         demo_mode: bool = False,
         presets: List[PresetConfig] = None,
-        on_run: Callable[[dict], None] = None  # 新增回调函数参数
+        on_run: Callable[[dict], None] = None,  # 新增回调函数参数
+        module_name: str = None  # 新增模块名参数
     ):
         super().__init__()
         self.program = program
@@ -98,6 +99,7 @@ class ConfigTemplate(App[None]):
         self._checkbox_states = {}
         self._input_values = {}
         self.on_run_callback = on_run  # 保存回调函数
+        self.module_name = module_name  # 保存模块名
 
     def _load_presets(self) -> dict:
         """加载预设配置"""
@@ -151,7 +153,7 @@ class ConfigTemplate(App[None]):
 
     def _apply_preset(self, preset_name: str) -> None:
         """应用预设配置"""
-        if preset_name not in self.presets:
+        if (preset_name not in self.presets):
             return
 
         preset = self.presets[preset_name]
@@ -277,7 +279,7 @@ class ConfigTemplate(App[None]):
         elif event.button.id == "delete-preset":
             # 删除当前选中的预设
             radio_set = self.query_one("#preset-radio", RadioSet)
-            if radio_set and radio_set.pressed_index is not None:
+            if (radio_set and radio_set.pressed_index is not None):
                 preset_name = list(self.presets.keys())[radio_set.pressed_index]
                 try:
                     del self.presets[preset_name]
@@ -306,9 +308,13 @@ class ConfigTemplate(App[None]):
         # 使用简化的python命令前缀
         cmd = ["python"]
         
-        # 添加程序路径（去掉多余的引号）
-        program_path = self.program.strip('"')
-        cmd.append(program_path)
+        # 检查是否使用模块方式运行
+        if hasattr(self, 'module_name') and self.module_name:
+            cmd.extend(["-m", self.module_name])
+        else:
+            # 添加程序路径（去掉多余的引号）
+            program_path = self.program.strip('"')
+            cmd.append(program_path)
 
         # 添加选中的功能选项
         selection_list = self.query_one(SelectionList)
@@ -549,7 +555,8 @@ def create_config_app(
     preset_configs: dict = None,
     on_run: Callable[[dict], None] = None,  
     parser: argparse.ArgumentParser = None,  # parser 参数
-    rich_mode: bool = False  # 是否使用Rich模式
+    rich_mode: bool = False,  # 是否使用Rich模式
+    module_name: str = None   # 新增：模块名称，用于 python -m module_name 方式运行
 ) -> Union[ConfigTemplate, Tuple[bool, dict], dict]:
     """
     创建配置界面的便捷函数
@@ -566,6 +573,7 @@ def create_config_app(
         on_run: 运行回调函数
         parser: ArgumentParser实例，用于自动生成选项
         rich_mode: 是否使用Rich模式界面
+        module_name: 模块名称，用于 python -m module_name 方式运行
     """
     # 如果使用Rich模式，直接调用rich_preset模块
     if rich_mode:
@@ -665,7 +673,8 @@ def create_config_app(
         extra_args=extra_args,
         demo_mode=demo_mode,
         presets=preset_list,
-        on_run=on_run  # 传递回调函数
+        on_run=on_run,  # 传递回调函数
+        module_name=module_name  # 传递模块名
     )
 
 # 使用示例
@@ -704,7 +713,8 @@ if __name__ == "__main__":
         # title="TUI配置界面演示 (无下拉选择)", # Updated title
         parser=parser, # Let it generate options from parser
         preset_configs=PRESET_CONFIGS,
-        rich_mode=True # Set to True to test rich mode (requires rich_preset.py update)
+        rich_mode=False,
+        module_name="demo"# Set to True to test rich mode (requires rich_preset.py update)
     )
     if app:
         app.run()
