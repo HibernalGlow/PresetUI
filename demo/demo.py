@@ -50,8 +50,8 @@ def show_textual_ui():
                 "input_values": {
                     "count": "10",
                     "output": "output.txt",
-                    "level": "1",
-                    "mode": "normal"
+                    # "level": "1",
+                    # "mode": "normal"
                 }
             },
             "高级配置": {

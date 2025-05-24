@@ -56,12 +56,10 @@ class SelectOption(ConfigOption):
         super().__init__(label, id, arg)
         # Ensure choices are strings
         self.choices = [str(c) for c in choices]
-        # Ensure default is a string and exists in choices, otherwise use the first choice or None
+        # Ensure default is a string and exists in choices, otherwise keep None
         str_default = str(default) if default is not None else None
         if str_default in self.choices:
             self.default = str_default
-        elif self.choices:
-            self.default = self.choices[0]
         else:
             self.default = None
 
@@ -405,14 +403,22 @@ class RichConfigApp:
                             self._parameter_values[opt.id] = value
                             self.console.print(f"[green]已设置 {opt.label}: {value}[/]")
                         else:
-                            self.console.print(f"[yellow]无效的值 '{value}'。可选值: {', '.join(opt.choices)}[/]")
-                    else: # User only provided index, prompt for choice
+                            self.console.print(f"[yellow]无效的值 '{value}'。可选值: {', '.join(opt.choices)}[/]")                    
+                             # User only provided index, prompt for choice
                         try:
-                            selected_choice = Prompt.ask(
-                                f"为 '{opt.label}' 选择",
-                                choices=opt.choices,
-                                default=self._parameter_values.get(opt.id, opt.default) # Show current as default
-                            )
+                            current_value = self._parameter_values.get(opt.id, opt.default)
+                            # Only set default if there's a current value
+                            if current_value is not None:
+                                selected_choice = Prompt.ask(
+                                    f"为 '{opt.label}' 选择",
+                                    choices=opt.choices,
+                                    default=current_value
+                                )
+                            else:
+                                selected_choice = Prompt.ask(
+                                    f"为 '{opt.label}' 选择",
+                                    choices=opt.choices
+                                )
                             self._parameter_values[opt.id] = selected_choice
                             self.console.print(f"[green]已选择 {opt.label}: {selected_choice}[/]")
                         except InvalidResponse:
@@ -538,12 +544,12 @@ def create_config_app(
             
             if isinstance(action, argparse._StoreTrueAction):
                 # 布尔标志 -> 复选框
-                checkbox_options.append((help_text, opt_id, opt_name, action.default))
+                checkbox_options.append((help_text, opt_id, opt_name, action.default))            
             elif action.choices:
                  # 带 choices 的参数 -> 下拉选择框
-                 default = str(action.default) if action.default is not None else None
-                 # Add to parameter_options as SelectOption format: (label, id, arg, choices, default)
-                 parameter_options.append((help_text, opt_id, opt_name, action.choices, default))
+                 # 不使用argparse的默认值，让SelectOption的默认值为None
+                 # 这样只有在预设配置中明确设置时才会有值
+                parameter_options.append((help_text, opt_id, opt_name, action.choices, None))
             else:
                 # 其他带值的参数 -> 输入框
                 default = str(action.default) if action.default is not None else ""
@@ -681,7 +687,7 @@ if __name__ == "__main__":
                 "number": "100", # Use opt_id (dest)
                 "text": "",
                 # "path": "", # Assuming no path arg
-                "choice": "A" # Use opt_id (dest)
+                # "choice": "A" # Use opt_id (dest)
             }
         },
         "快速模式": {
